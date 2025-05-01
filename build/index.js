@@ -10,10 +10,15 @@ const server = new Server({
 }, {
     capabilities: {
         tools: {},
+        logging: {},
     },
 });
 // Helper function for making NWS API requests
 async function makeNWSRequest(url) {
+    server.sendLoggingMessage({
+        level: "info",
+        data: `Making API request to ${url}`,
+    });
     const headers = {
         "User-Agent": USER_AGENT,
         Accept: "application/geo+json",
@@ -127,3 +132,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 });
 const transport = new StdioServerTransport();
 await server.connect(transport);
+server.sendLoggingMessage({
+    level: "info",
+    data: "Server started successfully",
+});

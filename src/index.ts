@@ -17,6 +17,7 @@ const server = new Server(
   {
     capabilities: {
       tools: {},
+      logging: {},
     },
   },
 );
@@ -44,6 +45,10 @@ interface ForecastResponse {
 
 // Helper function for making NWS API requests
 async function makeNWSRequest<T>(url: string): Promise<T | null> {
+  server.sendLoggingMessage({
+    level: "info",
+    data: `Making API request to ${url}`,
+  });
   const headers = {
     "User-Agent": USER_AGENT,
     Accept: "application/geo+json",
@@ -92,7 +97,10 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     throw new Error("Unknown prompt");
   }
 
-  const { latitude, longitude } = request.params.arguments as { latitude: number, longitude: number };
+  const { latitude, longitude } = request.params.arguments as {
+    latitude: number;
+    longitude: number;
+  };
 
   // Get grid point data
   const pointsUrl = `${NWS_API_BASE}/points/${latitude.toFixed(4)},${longitude.toFixed(4)}`;
@@ -171,3 +179,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
 const transport = new StdioServerTransport();
 await server.connect(transport);
+
+server.sendLoggingMessage({
+  level: "info",
+  data: "Server started successfully",
+});
