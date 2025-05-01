@@ -65,6 +65,10 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         throw new Error("Unknown prompt");
     }
     const { latitude, longitude } = request.params.arguments;
+    server.sendLoggingMessage({
+        level: "info",
+        data: request.params,
+    });
     // Get grid point data
     const pointsUrl = `${NWS_API_BASE}/points/${latitude.toFixed(4)},${longitude.toFixed(4)}`;
     const pointsData = await makeNWSRequest(pointsUrl);
@@ -121,6 +125,10 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         "---",
     ].join("\n"));
     const forecastText = `Forecast for ${latitude}, ${longitude}:\n\n${formattedForecast.join("\n")}`;
+    // server.sendLoggingMessage({
+    //   level: "info",
+    //   data: `forecastText: ${forecastText}`,
+    // });
     return {
         content: [
             {

@@ -49,6 +49,7 @@ async function makeNWSRequest<T>(url: string): Promise<T | null> {
     level: "info",
     data: `Making API request to ${url}`,
   });
+
   const headers = {
     "User-Agent": USER_AGENT,
     Accept: "application/geo+json",
@@ -101,6 +102,11 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     latitude: number;
     longitude: number;
   };
+
+  server.sendLoggingMessage({
+    level: "info",
+    data: request.params,
+  });
 
   // Get grid point data
   const pointsUrl = `${NWS_API_BASE}/points/${latitude.toFixed(4)},${longitude.toFixed(4)}`;
@@ -166,6 +172,11 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   );
 
   const forecastText = `Forecast for ${latitude}, ${longitude}:\n\n${formattedForecast.join("\n")}`;
+
+  // server.sendLoggingMessage({
+  //   level: "info",
+  //   data: `forecastText: ${forecastText}`,
+  // });
 
   return {
     content: [
