@@ -1,15 +1,15 @@
 export const codingGuidelines = {
   html: [
-    "「FlonCSS」のコーディングルール、classの命名規則に沿ってください",
+    "「FlonCSS」のコーディングルール、classの命名規則を確認しルールに沿ってくださいコーディングしてください",
     "よりセマンティックな html を意識してください",
     "デザインが与えられている場合、デザインをより忠実に再現してください",
-    "簡単なレイアウトや装飾部分は「FlonCSS」の utility class を用いてください",
-    "「FlonCSS」に存在しない utility class は使わないでください",
+    "簡単なレイアウトや装飾部分は「FlonCSS」の utility class を確認し、存在するものを使ってコーディングしてください",
+    "「FlonCSS」を確認し、存在しない utility class は使わないようにしてください",
     "複雑なレイアウトや装飾部分は独自にスタイルを記述して下さい",
     "img タグを使用する場合、alt, width, height 属性を必ず指定してください",
   ],
   css: [
-    "「FlonCSS」のコーディングルール、classの命名規則に沿ってください",
+    "「FlonCSS」のコーディングルール、classの命名規則を確認しルールに沿ってくださいコーディングしてください",
     "デザインが与えられている場合、デザインをより忠実に再現してください",
     "できるだけ color や font-size、gutter や gap など settings に定義したcss変数を利用してください",
     "特に指示がない場合、css は「src/assets/floncss/home.css」 に記述してください"
