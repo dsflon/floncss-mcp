@@ -1,4 +1,5 @@
-{
+// FlonCSS ドキュメントデータ
+export const floncssDocs = {
   "/": {
     "title": "FlonCSS - ユーティリティーファーストなCSSフレームワーク",
     "url": "https://floncss.dsflon.net/",
@@ -99,4 +100,8 @@
     "url": "https://floncss.dsflon.net/utilities/flex-layout",
     "content": "| Class | Properties |\n| --- | --- |\n| align items |\n| items:inherit | align-items: inherit; |\n| items:normal | align-items: normal; |\n| items:stretch | align-items: stretch; |\n| items:center | align-items: center; |\n| items:start | align-items: start; |\n| items:end | align-items: end; |\n| items:flex-start | align-items: flex-start; |\n| items:flex-end | align-items: flex-end; |\n| align self |\n| self:inherit | align-self: inherit; |\n| self:baseline | align-self: baseline; |\n| self:auto | align-self: auto; |\n| self:center | align-self: center; |\n| self:flex-start | align-self: flex-start; |\n| self:flex-end | align-self: flex-end; |\n| justify content |\n| justify:inherit | justify-content: inherit; |\n| justify:normal | justify-content: normal; |\n| justify:stretch | justify-content: stretch; |\n| justify:between | justify-content: between; |\n| justify:around | justify-content: around; |\n| justify:evenly | justify-content: evenly; |\n| justify:center | justify-content: center; |\n| justify:start | justify-content: start; |\n| justify:end | justify-content: end; |\n| justify:flex-start | justify-content: flex-start; |\n| justify:flex-end | justify-content: flex-end; |\n| justify self |\n| justify-self:inherit | justify-self: inherit; |\n| justify-self:baseline | justify-self: baseline; |\n| justify-self:auto | justify-self: auto; |\n| justify-self:center | justify-self: center; |\n| justify-self:flex-start | justify-self: flex-start; |\n| justify-self:flex-end | justify-self: flex-end; |\n| flex wrap |\n| flex-wrap | flex-wrap: wrap; |\n| flex-wrap-reverse | flex-wrap: wrap-reverse; |\n| flex-wrap-nowrap | flex-wrap: wrap-nowrap; |\n| flex shrink |\n| shrink:1 | flex-shrink: 1; |\n| shrink:0 | flex-shrink: 0; |\n| flex direction |\n| direction:column | flex-direction: column; |\n| direction:column-reverse | flex-direction: column-reverse; |\n| direction:row | flex-direction: row; |\n| direction:row-reverse | flex-direction: row-reverse; |\n| order |\n| order:1 | order: 1; |\n| order:2 | order: 2; |\n| order:3 | order: 3; |\n| order:4 | order: 4; |\n| order:5 | order: 5; |\n| order:6 | order: 6; |\n| order:7 | order: 7; |\n| order:8 | order: 8; |\n| order:9 | order: 9; |\n| order:10 | order: 10; |\n| order:11 | order: 11; |\n| order:12 | order: 12; |\n| order:first | order: -9999; |\n| order:last | order: 9999; |\n| order:last | order: 0; |\n| flex |\n| flex:1 | flex: 1 1 0%; |\n| flex:auto | flex: 1 1 auto |\n| flex:initial | flex: 0 1 auto |\n| flex:none | flex: none |"
   }
-}
+};
+
+// 型定義
+export type FlonCssDocPath = keyof typeof floncssDocs;
+export type FlonCssDocContent = typeof floncssDocs[FlonCssDocPath];

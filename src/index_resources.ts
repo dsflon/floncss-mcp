@@ -6,9 +6,7 @@ import {
   ListResourcesRequestSchema,
   ReadResourceRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
-import fs from "fs";
-import path, { dirname } from "path";
-import { fileURLToPath } from 'url';
+import { floncssDocs } from "./data/floncss-docs.js";
 
 // サーバーインスタンスの初期化
 const server = new Server(
@@ -24,10 +22,6 @@ const server = new Server(
   },
 );
 
-// FlonCSSのドキュメントデータを読み込む
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-const flonCSSDataPath = path.resolve(__dirname, '../src/docs/floncss-dsflon-net.json');
 // 型定義を追加
 interface DocumentData {
   title?: string;
@@ -40,11 +34,10 @@ interface FlonCSSDataType {
   [key: string]: DocumentData;
 }
 
-let flonCSSData: FlonCSSDataType = {};
+// TypeScriptモジュールからFlonCSSデータを取得
+let flonCSSData: FlonCSSDataType = floncssDocs;
 
 try {
-  const jsonContent = fs.readFileSync(flonCSSDataPath, 'utf8');
-  flonCSSData = JSON.parse(jsonContent) as FlonCSSDataType;
   console.log("FlonCSS documentation loaded successfully");
 } catch (error) {
   console.error(`Failed to load FlonCSS documentation: ${error}`);
