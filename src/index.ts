@@ -4,14 +4,14 @@ import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
-
-const NWS_API_BASE = "https://api.weather.gov";
-const USER_AGENT = "weather-app/1.0";
+import fs from "fs";
+import path, { dirname } from "path";
+import { fileURLToPath } from 'url';
 
 // [1] サーバーインスタンスの初期化
 const server = new Server(
   {
-    name: "weather",
+    name: "floncss-docs",
     version: "1.0.0",
   },
   {
@@ -22,49 +22,24 @@ const server = new Server(
   },
 );
 
-interface ForecastPeriod {
-  name?: string;
-  temperature?: number;
-  temperatureUnit?: string;
-  windSpeed?: string;
-  windDirection?: string;
-  shortForecast?: string;
-}
+// FlonCSSのドキュメントデータを読み込む
+// ESモジュール対応のパス解決
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const flonCSSDataPath = path.resolve(__dirname, '../src/docs/floncss-dsflon-net.json');
+let flonCSSData: Record<string, any> = {};
 
-interface PointsResponse {
-  properties: {
-    forecast?: string;
-  };
-}
-
-interface ForecastResponse {
-  properties: {
-    periods: ForecastPeriod[];
-  };
-}
-
-// Helper function for making NWS API requests
-async function makeNWSRequest<T>(url: string): Promise<T | null> {
-  server.sendLoggingMessage({
-    level: "info",
-    data: `Making API request to ${url}`,
-  });
-
-  const headers = {
-    "User-Agent": USER_AGENT,
-    Accept: "application/geo+json",
-  };
-
-  try {
-    const response = await fetch(url, { headers });
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    return (await response.json()) as T;
-  } catch (error) {
-    console.error("Error making NEW request:", error);
-    return null;
-  }
+try {
+  const jsonContent = fs.readFileSync(flonCSSDataPath, 'utf8');
+  flonCSSData = JSON.parse(jsonContent);
+  // 接続前はconsole.logを使用
+  console.log("FlonCSS documentation loaded successfully");
+  console.log(`Loaded from path: ${flonCSSDataPath}`);
+} catch (error) {
+  // 接続前はconsole.errorを使用
+  console.error(`Failed to load FlonCSS documentation: ${error}`);
+  console.error(`Attempted to load from path: ${flonCSSDataPath}`);
+  process.exit(1); // 読み込みに失敗した場合はプロセスを終了
 }
 
 // [2] 利用可能なToolの一覧を返す
@@ -72,126 +47,105 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
   return {
     tools: [
       {
-        name: "get_forecast",
-        description: "Get weather forecast for a location",
+        name: "get_floncss_docs",
+        description: "Get FlonCSS documentation content",
         inputSchema: {
           type: "object",
           properties: {
-            latitude: {
-              type: "number",
-              description: "Latitude of the location",
+            category: {
+              type: "string",
+              description: "Documentation category (docs, settings, utilities)",
+              enum: ["docs", "settings", "utilities"]
             },
-            longitude: {
-              type: "number",
-              description: "Longitude of the location",
+            path: {
+              type: "string",
+              description: "Optional specific path within the category (e.g. 'colors', 'installation')",
             },
           },
+          required: ["category"],
         },
       },
     ],
   };
 });
 
+// 指定されたカテゴリに一致するドキュメントを取得する関数
+function getDocsByCategory(category: string, specificPath?: string): { title: string, url: string, content: string }[] {
+  const results: { title: string, url: string, content: string }[] = [];
+  
+  for (const key in flonCSSData) {
+    // キーが指定されたカテゴリで始まり、特定のパスが指定されている場合はそのパスも含むかをチェック
+    if (key.startsWith(`/${category}/`) && (!specificPath || key === `/${category}/${specificPath}`)) {
+      const data = flonCSSData[key];
+      results.push({
+        title: data.title || 'FlonCSS',
+        url: data.url || `https://floncss.dsflon.net${key}`,
+        content: data.content || '',
+      });
+    }
+  }
+  
+  return results;
+}
+
 // [3] Toolの利用
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
-  if (request.params.name !== "get_forecast") {
-    throw new Error("Unknown prompt");
+  if (request.params.name !== "get_floncss_docs") {
+    throw new Error("Unknown tool");
   }
 
-  const { latitude, longitude } = request.params.arguments as {
-    latitude: number;
-    longitude: number;
+  const { category, path } = request.params.arguments as {
+    category: string;
+    path?: string;
   };
 
+  // サーバーが接続されている状態でのみ使用可能
   server.sendLoggingMessage({
     level: "info",
-    data: request.params,
+    data: `Fetching documentation for category: ${category}, path: ${path || 'all'}`,
   });
 
-  // Get grid point data
-  const pointsUrl = `${NWS_API_BASE}/points/${latitude.toFixed(4)},${longitude.toFixed(4)}`;
-  const pointsData = await makeNWSRequest<PointsResponse>(pointsUrl);
+  // カテゴリに基づいてドキュメントを取得
+  const docs = getDocsByCategory(category, path);
 
-  if (!pointsData) {
+  if (docs.length === 0) {
     return {
       content: [
         {
           type: "text",
-          text: `Failed to retrieve grid point data for coordinates: ${latitude}, ${longitude}. This location may not be supported by the NWS API (only US locations are supported).`,
+          text: `No documentation found for category: ${category}${path ? `, path: ${path}` : ''}`,
         },
       ],
     };
   }
 
-  const forecastUrl = pointsData.properties?.forecast;
-  if (!forecastUrl) {
-    return {
-      content: [
-        {
-          type: "text",
-          text: "Failed to get forecast URL from grid point data",
-        },
-      ],
-    };
-  }
-
-  // Get forecast data
-  const forecastData = await makeNWSRequest<ForecastResponse>(forecastUrl);
-  if (!forecastData) {
-    return {
-      content: [
-        {
-          type: "text",
-          text: "Failed to retrieve forecast data",
-        },
-      ],
-    };
-  }
-
-  const periods = forecastData.properties?.periods || [];
-  if (periods.length === 0) {
-    return {
-      content: [
-        {
-          type: "text",
-          text: "No forecast periods available",
-        },
-      ],
-    };
-  }
-
-  // Format forecast periods
-  const formattedForecast = periods.map((period: ForecastPeriod) =>
-    [
-      `${period.name || "Unknown"}:`,
-      `Temperature: ${period.temperature || "Unknown"}°${period.temperatureUnit || "F"}`,
-      `Wind: ${period.windSpeed || "Unknown"} ${period.windDirection || ""}`,
-      `${period.shortForecast || "No forecast available"}`,
-      "---",
-    ].join("\n"),
-  );
-
-  const forecastText = `Forecast for ${latitude}, ${longitude}:\n\n${formattedForecast.join("\n")}`;
-
-  // server.sendLoggingMessage({
-  //   level: "info",
-  //   data: `forecastText: ${forecastText}`,
-  // });
+  // 結果をフォーマット
+  const formattedDocs = docs.map(doc => {
+    return [
+      `# ${doc.title}`,
+      `URL: ${doc.url}`,
+      "",
+      doc.content,
+      "---"
+    ].join("\n");
+  });
 
   return {
     content: [
       {
         type: "text",
-        text: forecastText,
+        text: formattedDocs.join("\n\n"),
       },
     ],
   };
 });
 
+// サーバーを接続
 const transport = new StdioServerTransport();
 await server.connect(transport);
 
+// 接続後のみsendLoggingMessageを使用
 server.sendLoggingMessage({
   level: "info",
-  data: "Server started successfully",
+  data: "FlonCSS documentation server started successfully",
 });
