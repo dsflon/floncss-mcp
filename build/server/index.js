@@ -56,7 +56,7 @@ export function createServer() {
                             category: {
                                 type: "string",
                                 description: "Optional guideline category (html, css, assets)",
-                                enum: ["html", "css", "assets", "js", "general", "all"],
+                                enum: ["html", "css", "assets", "js", "all"],
                             },
                         },
                         required: [],

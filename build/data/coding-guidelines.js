@@ -1,9 +1,4 @@
 export const codingGuidelines = {
-    general: [
-        "「FlonCSS」のコーディングルール、classの命名規則に沿ってください",
-        "よりセマンティックな html を意識してください",
-        "デザインが与えられている場合、デザインをより忠実に再現してください"
-    ],
     html: [
         "「FlonCSS」のコーディングルール、classの命名規則に沿ってください",
         "よりセマンティックな html を意識してください",
