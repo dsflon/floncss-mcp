@@ -59,7 +59,7 @@ export function handleFloncssMentionRequest(text, server) {
                 content: [
                     {
                         type: "text",
-                        text: "No @floncss: prompts found. Available prompts: @floncss:coding, @floncss:refactor",
+                        text: "No @floncss: prompts found. Available prompts: @floncss:coding, @floncss:refactor, @floncss:setting",
                     },
                 ],
             };
@@ -77,7 +77,7 @@ export function handleFloncssMentionRequest(text, server) {
                 ],
             };
         }
-        // coding プロンプトの場合、自動的にFlonCSSドキュメントを取得
+        // coding または refactor プロンプトの場合、自動的にFlonCSSドキュメントを取得
         if ((promptType === 'coding' || promptType === 'refactor') && server) {
             let allDocs = '';
             // docs カテゴリの全ドキュメント
@@ -95,6 +95,20 @@ export function handleFloncssMentionRequest(text, server) {
                     {
                         type: "text",
                         text: `Activating FlonCSS ${promptType} mode with complete reference documentation.\n\n${prompt.content}\n\n## FlonCSS Complete Reference Documentation\n\n${allDocs}`
+                    },
+                ],
+            };
+        }
+        // setting プロンプトの場合、settings カテゴリのドキュメントのみを取得
+        if (promptType === 'setting' && server) {
+            // settings カテゴリのドキュメントのみ
+            const settingsAll = handleFlonCSSDocsRequest(server, 'settings');
+            // ドキュメント情報とプロンプトを組み合わせる
+            return {
+                content: [
+                    {
+                        type: "text",
+                        text: `Activating FlonCSS ${promptType} mode with settings documentation.\n\n${prompt.content}\n\n## FlonCSS Settings Documentation\n\n${settingsAll.content[0].text}`
                     },
                 ],
             };
@@ -122,7 +136,7 @@ export function handleFloncssMentionRequest(text, server) {
             ],
         };
     }
-    // coding プロンプトの場合、自動的にFlonCSSドキュメントを取得
+    // coding または refactor プロンプトの場合、自動的にFlonCSSドキュメントを取得
     if ((promptType === 'coding' || promptType === 'refactor') && server) {
         let allDocs = '';
         // docs カテゴリの全ドキュメント
@@ -140,6 +154,20 @@ export function handleFloncssMentionRequest(text, server) {
                 {
                     type: "text",
                     text: `Activating FlonCSS ${promptType} mode with complete reference documentation.\n\n${prompt.content}\n\n## FlonCSS Complete Reference Documentation\n\n${allDocs}`
+                },
+            ],
+        };
+    }
+    // setting プロンプトの場合、settings カテゴリのドキュメントのみを取得
+    if (promptType === 'setting' && server) {
+        // settings カテゴリのドキュメントのみ
+        const settingsAll = handleFlonCSSDocsRequest(server, 'settings');
+        // ドキュメント情報とプロンプトを組み合わせる
+        return {
+            content: [
+                {
+                    type: "text",
+                    text: `Activating FlonCSS ${promptType} mode with settings documentation.\n\n${prompt.content}\n\n## FlonCSS Settings Documentation\n\n${settingsAll.content[0].text}`
                 },
             ],
         };

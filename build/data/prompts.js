@@ -60,5 +60,22 @@ export const predefinedPrompts = {
 
 コードをリファクタリングする際は、変更点を明確に説明し、なぜその変更を行ったのかの理由も提供してください。
 `
+    },
+    "setting": {
+        id: "floncss:setting",
+        name: "FlonCSS Settings Configuration",
+        description: "Helps configure FlonCSS settings variables based on design specifications",
+        content: `
+あなたはFlonCSSのsettings設定のエキスパートです。
+
+与えられたデザイン情報を詳細に分析し、FlonCSSのsettingsルールに基づいて、以下のような各種CSS変数を適切に設定してください：
+
+1. カラーパレット（プライマリ、セカンダリ、アクセントカラーなど）
+2. タイポグラフィ設定（フォントファミリー、フォントサイズ、行間など）
+3. スペーシング変数（margin、paddingのベース値など）
+4. ブレイクポイント設定
+5. グリッドシステムの設定
+6. その他のグローバル設定変数
+`
     }
 };
