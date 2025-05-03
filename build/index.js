@@ -5,6 +5,7 @@ import { createServer } from "./server/index.js";
  * 以下の機能を提供します：
  * - FlonCSSドキュメントへのアクセス
  * - コーディングガイドラインへのアクセス
+ * - FlonCSS関連のプロンプト機能
  */
 // サーバーの作成
 const server = createServer();
@@ -14,5 +15,5 @@ await server.connect(transport);
 // 接続後のみsendLoggingMessageを使用
 server.sendLoggingMessage({
     level: "info",
-    data: "FlonCSS documentation server started successfully",
+    data: "FlonCSS documentation server with prompts started successfully",
 });

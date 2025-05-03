@@ -1,12 +1,19 @@
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import {
   CallToolRequestSchema,
+  GetPromptRequestSchema,
+  ListPromptsRequestSchema,
   ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
 import type { GuidelineCategory } from "../data/coding-guidelines.js";
 import type { ServerConfig } from "../types/index.js";
 import { handleCodingGuidelinesRequest } from "./tools/coding-guidelines.js";
 import { handleFlonCSSDocsRequest } from "./tools/floncss-docs.js";
+import {
+  handleFloncssMentionRequest,
+  handleGetPromptRequest,
+  handleListPromptsRequest
+} from "./tools/prompts.js";
 
 // サーバー設定
 const serverConfig: ServerConfig = {
@@ -21,6 +28,7 @@ export function createServer(): Server {
     {
       capabilities: {
         tools: {},
+        prompts: {}, // Promptsケイパビリティを追加
         logging: {},
       },
     },
@@ -73,8 +81,32 @@ export function createServer(): Server {
             required: [],
           },
         },
+        {
+          name: "handle_floncss_mention",
+          description: "Handle @floncss: mentions in text",
+          inputSchema: {
+            type: "object",
+            properties: {
+              text: {
+                type: "string",
+                description: "Text containing @floncss: mentions",
+              },
+            },
+            required: ["text"],
+          },
+        },
       ],
     };
+  });
+
+  // プロンプト一覧を返すハンドラー
+  server.setRequestHandler(ListPromptsRequestSchema, async () => {
+    return handleListPromptsRequest();
+  });
+
+  // 特定のプロンプトを返すハンドラー
+  server.setRequestHandler(GetPromptRequestSchema, async (request) => {
+    return handleGetPromptRequest(request.params.id as string);
   });
 
   // Toolの利用リクエストを処理するハンドラを設定
@@ -93,6 +125,12 @@ export function createServer(): Server {
       };
       
       return handleCodingGuidelinesRequest(server, category);
+    } else if (request.params.name === "handle_floncss_mention") {
+      const { text } = request.params.arguments as {
+        text: string;
+      };
+      
+      return handleFloncssMentionRequest(text, server);
     }
 
     throw new Error(`Unknown tool: ${request.params.name}`);
