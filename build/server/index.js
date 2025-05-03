@@ -1,6 +1,5 @@
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { CallToolRequestSchema, GetPromptRequestSchema, ListPromptsRequestSchema, ListToolsRequestSchema, } from "@modelcontextprotocol/sdk/types.js";
-import { handleCodingGuidelinesRequest } from "./tools/coding-guidelines.js";
 import { handleFlonCSSDocsRequest } from "./tools/floncss-docs.js";
 import { handleFloncssMentionRequest, handleGetPromptRequest, handleListPromptsRequest } from "./tools/prompts.js";
 // サーバー設定
@@ -50,21 +49,6 @@ export function createServer() {
                     },
                 },
                 {
-                    name: "get_coding_guidelines",
-                    description: "Get coding guidelines for FlonCSS implementation",
-                    inputSchema: {
-                        type: "object",
-                        properties: {
-                            category: {
-                                type: "string",
-                                description: "Optional guideline category (html, css, assets)",
-                                enum: ["html", "css", "assets", "js", "all"],
-                            },
-                        },
-                        required: [],
-                    },
-                },
-                {
                     name: "handle_floncss_mention",
                     description: "Handle @floncss: mentions in text",
                     inputSchema: {
@@ -94,10 +78,6 @@ export function createServer() {
         if (request.params.name === "get_floncss_docs") {
             const { category, path } = request.params.arguments;
             return handleFlonCSSDocsRequest(server, category, path);
-        }
-        else if (request.params.name === "get_coding_guidelines") {
-            const { category } = request.params.arguments;
-            return handleCodingGuidelinesRequest(server, category);
         }
         else if (request.params.name === "handle_floncss_mention") {
             const { text } = request.params.arguments;

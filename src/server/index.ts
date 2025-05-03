@@ -5,9 +5,7 @@ import {
   ListPromptsRequestSchema,
   ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
-import type { GuidelineCategory } from "../data/coding-guidelines.js";
 import type { ServerConfig } from "../types/index.js";
-import { handleCodingGuidelinesRequest } from "./tools/coding-guidelines.js";
 import { handleFlonCSSDocsRequest } from "./tools/floncss-docs.js";
 import {
   handleFloncssMentionRequest,
@@ -67,21 +65,6 @@ export function createServer(): Server {
           },
         },
         {
-          name: "get_coding_guidelines",
-          description: "Get coding guidelines for FlonCSS implementation",
-          inputSchema: {
-            type: "object",
-            properties: {
-              category: {
-                type: "string",
-                description: "Optional guideline category (html, css, assets)",
-                enum: ["html", "css", "assets", "js", "all"],
-              },
-            },
-            required: [],
-          },
-        },
-        {
           name: "handle_floncss_mention",
           description: "Handle @floncss: mentions in text",
           inputSchema: {
@@ -118,13 +101,6 @@ export function createServer(): Server {
       };
       
       return handleFlonCSSDocsRequest(server, category, path);
-
-    } else if (request.params.name === "get_coding_guidelines") {
-      const { category } = request.params.arguments as {
-        category?: GuidelineCategory;
-      };
-      
-      return handleCodingGuidelinesRequest(server, category);
     } else if (request.params.name === "handle_floncss_mention") {
       const { text } = request.params.arguments as {
         text: string;
