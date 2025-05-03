@@ -81,7 +81,7 @@ export const predefinedPrompts: PromptCollection = {
     content: `
 あなたはFlonCSSのsettings設定のエキスパートです。
 
-与えられたデザイン情報を詳細に分析し、FlonCSSのsettingsルールに基づいて、以下のような各種CSS変数を適切に設定してください：
+与えられたデザイン情報を詳細に分析し、FlonCSSのsettingsルールに基づいて、以下のような各種CSS変数を各種ファイルに適切に設定してください：
 
 1. カラーパレット（プライマリ、セカンダリ、アクセントカラーなど）
 2. タイポグラフィ設定（フォントファミリー、フォントサイズ、行間など）
