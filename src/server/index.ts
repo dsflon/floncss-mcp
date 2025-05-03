@@ -47,13 +47,13 @@ export function createServer(): Server {
       tools: [
         {
           name: "handle_floncss_mention",
-          description: "Handle #floncss: mentions in text",
+          description: "Handle @floncss: mentions in text",
           inputSchema: {
             type: "object",
             properties: {
               text: {
                 type: "string",
-                description: "Text containing #floncss: mentions",
+                description: "Text containing @floncss: mentions",
               },
             },
             required: ["text"],
