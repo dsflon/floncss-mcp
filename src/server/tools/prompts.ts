@@ -63,14 +63,14 @@ export function handleFloncssMentionRequest(text: string, server?: Server) {
       content: [
         {
           type: "text",
-          text: "No @floncss: prompts found. Available prompts: @floncss:coding, @floncss:design",
+          text: "No @floncss: prompts found. Available prompts: @floncss:coding, @floncss:refactor",
         },
       ],
     };
   }
   
   // 最初のメンションを処理（複数ある場合は先頭のみ）
-  const promptType = mentions[0][1]; // coding, design などの部分
+  const promptType = mentions[0][1]; // coding, refactor などの部分
   const prompt = predefinedPrompts[promptType as keyof typeof predefinedPrompts];
   
   if (!prompt) {
@@ -85,18 +85,27 @@ export function handleFloncssMentionRequest(text: string, server?: Server) {
   }
 
   // coding プロンプトの場合、自動的にFlonCSSドキュメントを取得
-  if (promptType === 'coding' && server) {
-    // 主要なカテゴリのドキュメントを取得
-    const docsInfo = handleFlonCSSDocsRequest(server, 'docs', 'architecture');
-    const utilitiesInfo = handleFlonCSSDocsRequest(server, 'utilities', 'columns');
-    const settingsInfo = handleFlonCSSDocsRequest(server, 'settings', 'colors');
+  if ((promptType === 'coding' || promptType === 'refactor') && server) {
+    let allDocs = '';
+    
+    // docs カテゴリの全ドキュメント
+    const docseAll = handleFlonCSSDocsRequest(server, 'docs');
+    allDocs += `${docseAll.content[0].text}\n\n`;
+    
+    // utilities カテゴリの全ドキュメント
+    const utilitiesAll = handleFlonCSSDocsRequest(server, 'utilities');
+    allDocs += `${utilitiesAll.content[0].text}\n\n`;
+    
+    // settings カテゴリの全ドキュメント
+    const settingsAll = handleFlonCSSDocsRequest(server, 'settings');
+    allDocs += `${settingsAll.content[0].text}\n\n`;
     
     // ドキュメント情報とプロンプトを組み合わせる
     return {
       content: [
         {
           type: "text",
-          text: `Activating FlonCSS ${promptType} mode with reference documentation.\n\n${prompt.content}\n\n## FlonCSS Reference Documentation\n\n${docsInfo.content[0].text}\n\n${utilitiesInfo.content[0].text}\n\n${settingsInfo.content[0].text}`
+          text: `Activating FlonCSS ${promptType} mode with complete reference documentation.\n\n${prompt.content}\n\n## FlonCSS Complete Reference Documentation\n\n${allDocs}`
         },
       ],
     };
