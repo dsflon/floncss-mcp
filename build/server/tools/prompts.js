@@ -47,21 +47,70 @@ export function handleGetPromptRequest(promptId) {
  * @param server MCPサーバーインスタンス（ドキュメントツール呼び出し用）
  */
 export function handleFloncssMentionRequest(text, server) {
-    // @floncss:タイプ形式のメンションを検出
-    const mentionRegex = /@floncss:(\w+)/g;
+    // @floncss:タイプ形式のメンションを検出（前後の文字や改行、スペースを許容）
+    const mentionRegex = /(?:^|\s|\n|[^\w])(@floncss:(\w+))(?:$|\s|\n|[^\w])/g;
     const mentions = [...text.matchAll(mentionRegex)];
     if (mentions.length === 0) {
+        // より柔軟にマッチさせるためのフォールバック
+        const simpleRegex = /@floncss:(\w+)/g;
+        const simpleMatches = [...text.matchAll(simpleRegex)];
+        if (simpleMatches.length === 0) {
+            return {
+                content: [
+                    {
+                        type: "text",
+                        text: "No @floncss: prompts found. Available prompts: @floncss:coding, @floncss:refactor",
+                    },
+                ],
+            };
+        }
+        // シンプルな検出方法でメンションを見つけた場合
+        const promptType = simpleMatches[0][1]; // coding, refactor などの部分
+        const prompt = predefinedPrompts[promptType];
+        if (!prompt) {
+            return {
+                content: [
+                    {
+                        type: "text",
+                        text: `Unknown prompt type: ${promptType}. Available prompts: ${Object.keys(predefinedPrompts).join(', ')}`,
+                    },
+                ],
+            };
+        }
+        // coding プロンプトの場合、自動的にFlonCSSドキュメントを取得
+        if ((promptType === 'coding' || promptType === 'refactor') && server) {
+            let allDocs = '';
+            // docs カテゴリの全ドキュメント
+            const docseAll = handleFlonCSSDocsRequest(server, 'docs');
+            allDocs += `${docseAll.content[0].text}\n\n`;
+            // utilities カテゴリの全ドキュメント
+            const utilitiesAll = handleFlonCSSDocsRequest(server, 'utilities');
+            allDocs += `${utilitiesAll.content[0].text}\n\n`;
+            // settings カテゴリの全ドキュメント
+            const settingsAll = handleFlonCSSDocsRequest(server, 'settings');
+            allDocs += `${settingsAll.content[0].text}\n\n`;
+            // ドキュメント情報とプロンプトを組み合わせる
+            return {
+                content: [
+                    {
+                        type: "text",
+                        text: `Activating FlonCSS ${promptType} mode with complete reference documentation.\n\n${prompt.content}\n\n## FlonCSS Complete Reference Documentation\n\n${allDocs}`
+                    },
+                ],
+            };
+        }
+        // 他のプロンプトタイプの場合は通常どおり処理
         return {
             content: [
                 {
                     type: "text",
-                    text: "No @floncss: prompts found. Available prompts: @floncss:coding, @floncss:refactor",
+                    text: `Activating FlonCSS ${promptType} mode.\n\n${prompt.content}`,
                 },
             ],
         };
     }
     // 最初のメンションを処理（複数ある場合は先頭のみ）
-    const promptType = mentions[0][1]; // coding, refactor などの部分
+    const promptType = mentions[0][2]; // 正規表現のキャプチャグループが変更されたため、インデックスも変更
     const prompt = predefinedPrompts[promptType];
     if (!prompt) {
         return {

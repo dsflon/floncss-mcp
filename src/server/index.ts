@@ -46,6 +46,20 @@ export function createServer(): Server {
     return {
       tools: [
         {
+          name: "handle_floncss_mention",
+          description: "Handle #floncss: mentions in text",
+          inputSchema: {
+            type: "object",
+            properties: {
+              text: {
+                type: "string",
+                description: "Text containing #floncss: mentions",
+              },
+            },
+            required: ["text"],
+          },
+        },
+        {
           name: "get_floncss_docs",
           description: "Get FlonCSS documentation content",
           inputSchema: {
@@ -64,20 +78,6 @@ export function createServer(): Server {
             required: ["category"],
           },
         },
-        {
-          name: "handle_floncss_mention",
-          description: "Handle @floncss: mentions in text",
-          inputSchema: {
-            type: "object",
-            properties: {
-              text: {
-                type: "string",
-                description: "Text containing @floncss: mentions",
-              },
-            },
-            required: ["text"],
-          },
-        },
       ],
     };
   });
@@ -94,20 +94,20 @@ export function createServer(): Server {
 
   // Toolの利用リクエストを処理するハンドラを設定
   server.setRequestHandler(CallToolRequestSchema, async (request) => {
-    if (request.params.name === "get_floncss_docs") {
+    if (request.params.name === "handle_floncss_mention") {
+      const { text } = request.params.arguments as {
+        text: string;
+      };
+      
+      return handleFloncssMentionRequest(text, server);
+    } else if (request.params.name === "get_floncss_docs") {
       const { category, path } = request.params.arguments as {
         category: string;
         path?: string;
       };
       
       return handleFlonCSSDocsRequest(server, category, path);
-    } else if (request.params.name === "handle_floncss_mention") {
-      const { text } = request.params.arguments as {
-        text: string;
-      };
-      
-      return handleFloncssMentionRequest(text, server);
-    }
+    } 
 
     throw new Error(`Unknown tool: ${request.params.name}`);
   });
