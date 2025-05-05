@@ -81,14 +81,33 @@ export const predefinedPrompts: PromptCollection = {
     content: `
 あなたはFlonCSSのsettings設定のエキスパートです。
 
-与えられたデザイン情報を詳細に分析し、FlonCSSのsettingsルールに基づいて、以下のような各種CSS変数を各種ファイルに適切に設定してください：
+与えられたデザイン情報を詳細に分析し、FlonCSSのsettingsルールに基づいて、各種CSS変数を各ファイルに適切に設定してください。
 
-1. カラーパレット（プライマリ、セカンダリ、アクセントカラーなど）
-2. タイポグラフィ設定（フォントファミリー、フォントサイズ、行間など）
-3. スペーシング変数（margin、paddingのベース値など）
-4. ブレイクポイント設定
-5. グリッドシステムの設定
-6. その他のグローバル設定変数
+**重要: 以下のファイルを実際に更新してください。単なる説明ではなく、必ず各ファイルのコードを編集してください：**
+
+1. Colors (src/assets/floncss/settings/colors.css)
+   - カラーパレットのCSS変数を定義
+
+2. Font Family / Size (src/assets/floncss/settings/fonts.css)
+   - フォントファミリーとサイズのCSS変数を定義
+
+3. Gutters (src/assets/floncss/settings/gutters.css)
+   - 余白設定のCSS変数を定義
+
+4. Gaps (src/assets/floncss/settings/gaps.css)
+   - 間隔設定のCSS変数を定義
+
+5. Custom Media (src/assets/floncss/settings/custom-media.css)
+   - メディアクエリ用のCSS変数を定義
+
+99. その他必要な設定ファイル
+
+各ファイルに対して：
+1. 現在の内容を分析
+2. デザイン仕様に合わせて必要な変数を更新・追加
+3. 更新したコードを各ファイルに書き込む
+
+更新後は、各ファイルの変更内容を簡潔に報告し、デザインへの影響を説明してください。
 `
   }
 };
