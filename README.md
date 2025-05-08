@@ -75,22 +75,39 @@ VS Code で MCP を使用するには、以下の手順で設定します。
 
 ## MCP サーバーの使用方法
 
-この MCP サーバーは以下のツールを提供しています：
+この MCP サーバーは以下のツールと機能を提供しています：
 
 - `get_floncss_docs`: FlonCSS のドキュメントを取得する
+
   - パラメータ:
     - `category`: ドキュメントのカテゴリ（"docs", "settings", "utilities"のいずれか、必須）
     - `path`: カテゴリ内の特定のパス（例：'colors', 'installation'、オプション）
+
+- `handle_floncss_mention`: テキスト内の @floncss: 形式のメンションを検出して対応するプロンプトを返す
+
+  - パラメータ:
+    - `text`: メンションを含むテキスト（必須）
+  - サポートされるメンション:
+    - `@floncss:coding`: コーディングに関するプロンプトと FlonCSS の全ドキュメントを提供
+    - `@floncss:refactor`: リファクタリングに関するプロンプトと FlonCSS の全ドキュメントを提供
+    - `@floncss:setting`: 設定に関するプロンプトと FlonCSS の設定ドキュメントを提供
+
+- **プロンプト機能**: 事前定義されたプロンプトを管理・提供
+  - MCP プロトコルの prompts ケイパビリティをサポート
 
 ## 例
 
 VS Code で次のように MCP コマンドを使用できます：
 
 ```
+# FlonCSSのドキュメントを取得
 @floncss-mcp get_floncss_docs category=docs path=installation
-```
 
-これにより、FlonCSS のインストールに関するドキュメントが表示されます。
+# テキスト内のFlonCSSメンションを処理
+@floncss-mcp handle_floncss_mention text="FlonCSSを使って@floncss:codingしましょう"
+
+# プロンプト機能を使用（VS CodeのMCPインターフェースによる）
+```
 
 ## トラブルシューティング
 
