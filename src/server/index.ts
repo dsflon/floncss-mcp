@@ -34,7 +34,7 @@ export function createServer(): Server {
 
   try {
     // データが正常にロードされたことを確認
-    console.log("FlonCSS documentation loaded successfully");
+    // console.info("FlonCSS documentation loaded successfully");
   } catch (error) {
     // 接続前はconsole.errorを使用
     console.error(`Failed to load FlonCSS documentation: ${error}`);

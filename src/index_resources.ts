@@ -38,7 +38,7 @@ interface FlonCSSDataType {
 let flonCSSData: FlonCSSDataType = floncssDocs;
 
 try {
-  console.log("FlonCSS documentation loaded successfully");
+  // console.log("FlonCSS documentation loaded successfully");
 } catch (error) {
   console.error(`Failed to load FlonCSS documentation: ${error}`);
   process.exit(1);
