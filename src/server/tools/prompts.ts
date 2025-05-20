@@ -1,6 +1,6 @@
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
-import { predefinedPrompts } from "../../data/prompts.js";
-import { handleFlonCSSDocsRequest } from "./floncss-docs.js";
+import { predefinedPrompts } from "../../data/prompts";
+import { handleFlonCSSDocsRequest } from "./floncss-docs";
 
 /**
  * プロンプト一覧取得リクエストのハンドラー

@@ -36,3 +36,10 @@ test-output
 # OS
 .DS_Store
 Thumbs.db
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
