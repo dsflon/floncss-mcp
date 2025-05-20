@@ -7,7 +7,9 @@
     "my-mcp-server": "./build/index.js"
   },
   "scripts": {
-    "build": "tsc && chmod 755 build/index.js"
+    "build": "tsc && chmod 755 build/index.js",
+    "vercel-build": "tsc",
+    "deploy": "vercel deploy --prod"
   },
   "files": [
     "build"
@@ -17,10 +19,14 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.10.2"
+    "@modelcontextprotocol/sdk": "^1.10.2",
+    "@vercel/mcp-adapter": "^0.5.0",
+    "zod": "^3.25.7"
   },
   "devDependencies": {
     "@types/node": "^22.15.3",
-    "typescript": "^5.8.3"
+    "@vercel/node": "^3.2.29",
+    "typescript": "^5.8.3",
+    "vercel": "^33.7.1"
   }
 }
