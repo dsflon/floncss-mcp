@@ -1,26 +1,25 @@
 {
-  "name": "mcp-server-quickstart",
+  "name": "floncss-mcp",
   "version": "1.0.0",
-  "main": "index.js",
-  "type": "module",
-  "bin": {
-    "my-mcp-server": "./build/index.js"
-  },
+  "private": true,
   "scripts": {
-    "build": "tsc && chmod 755 build/index.js"
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
   },
-  "files": [
-    "build"
-  ],
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.10.2"
+    "@modelcontextprotocol/sdk": "^1.11.4",
+    "@vercel/mcp-adapter": "^0.5.0",
+    "next": "15.3.2",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "zod": "^3.25.7"
   },
   "devDependencies": {
-    "@types/node": "^22.15.3",
-    "typescript": "^5.8.3"
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "typescript": "^5"
   }
 }

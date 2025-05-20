@@ -1,6 +1,6 @@
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
-import { floncssDocs } from "../../data/floncss-docs.js";
-import type { FlonCSSData } from "../../types/index.js";
+import { floncssDocs } from "../../data/floncss-docs";
+import type { FlonCSSData } from "../../types/index";
 
 // FlonCSSドキュメント関連の型定義
 interface DocResult {
