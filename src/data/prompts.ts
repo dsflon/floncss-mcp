@@ -17,7 +17,7 @@ export type PromptCollection = {
 // FlonCSS用の事前定義されたプロンプト
 export const predefinedPrompts: PromptCollection = {
   "coding": {
-    id: "floncss:coding",
+    id: "floncss-coding",
     name: "FlonCSS Coding Mode",
     description: "Activate FlonCSS coding assistant mode with complete documentation for building HTML/CSS following FlonCSS framework best practices and ITCSS principles",
     content: `
@@ -45,7 +45,7 @@ export const predefinedPrompts: PromptCollection = {
 `
   },
   "refactor": {
-    id: "floncss:refactor",
+    id: "floncss-refactor",
     name: "FlonCSS Refactoring Mode",
     description: "Activate FlonCSS refactoring mode with complete documentation for refactoring existing HTML/CSS to follow FlonCSS best practices and ITCSS architecture",
     content: `
@@ -75,7 +75,7 @@ export const predefinedPrompts: PromptCollection = {
 `
   },
   "setting": {
-    id: "floncss:setting",
+    id: "floncss-setting",
     name: "FlonCSS Settings Configuration Mode",
     description: "Activate FlonCSS settings configuration mode with settings documentation for configuring CSS variables (colors, fonts, gutters, gaps, breakpoints) based on design specifications",
     content: `

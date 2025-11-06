@@ -114,13 +114,13 @@ VS Code で MCP を使用するには、以下の手順で設定します。
 
 VS Code Copilot チャットで `/` を入力すると、以下のプロンプトが使用できます：
 
-- **`/floncss:coding`** - FlonCSS コーディングモードを起動
+- **`/floncss-coding`** - FlonCSS コーディングモードを起動
   - FlonCSS フレームワークに従った HTML/CSS のコーディングをサポート
   - 完全なドキュメント（docs、utilities、settings）が自動的に読み込まれます
-- **`/floncss:refactor`** - FlonCSS リファクタリングモードを起動
+- **`/floncss-refactor`** - FlonCSS リファクタリングモードを起動
   - 既存のコードを FlonCSS のベストプラクティスに従ってリファクタリング
   - ITCSS アーキテクチャの原則に基づいた改善をサポート
-- **`/floncss:setting`** - FlonCSS 設定モードを起動
+- **`/floncss-setting`** - FlonCSS 設定モードを起動
   - デザイン仕様に基づいて CSS 変数を設定
   - colors、fonts、gutters、gaps、breakpoints の設定をサポート
 
@@ -163,7 +163,7 @@ FlonCSS のドキュメントを直接取得します。
 VS Code Copilot チャットで：
 
 ```
-/floncss:coding
+/floncss-coding
 
 デザインに基づいてヒーローセクションを作成してください
 ```
