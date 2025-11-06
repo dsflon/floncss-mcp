@@ -108,38 +108,78 @@ VS Code で MCP を使用するには、以下の手順で設定します。
 
 ## MCP サーバーの使用方法
 
-この MCP サーバーは以下のツールと機能を提供しています：
+この MCP サーバーは以下の機能を提供しています：
 
-- `get_floncss_docs`: FlonCSS のドキュメントを取得する
+### 1. プロンプト機能（推奨）
 
-  - パラメータ:
-    - `category`: ドキュメントのカテゴリ（"docs", "settings", "utilities"のいずれか、必須）
-    - `path`: カテゴリ内の特定のパス（例：'colors', 'installation'、オプション）
+VS Code Copilot チャットで `/` を入力すると、以下のプロンプトが使用できます：
 
-- `handle_floncss_mention`: テキスト内の @floncss: 形式のメンションを検出して対応するプロンプトを返す
+- **`/floncss:coding`** - FlonCSS コーディングモードを起動
+  - FlonCSS フレームワークに従った HTML/CSS のコーディングをサポート
+  - 完全なドキュメント（docs、utilities、settings）が自動的に読み込まれます
+- **`/floncss:refactor`** - FlonCSS リファクタリングモードを起動
+  - 既存のコードを FlonCSS のベストプラクティスに従ってリファクタリング
+  - ITCSS アーキテクチャの原則に基づいた改善をサポート
+- **`/floncss:setting`** - FlonCSS 設定モードを起動
+  - デザイン仕様に基づいて CSS 変数を設定
+  - colors、fonts、gutters、gaps、breakpoints の設定をサポート
 
-  - パラメータ:
-    - `text`: メンションを含むテキスト（必須）
-  - サポートされるメンション:
-    - `@floncss:coding`: コーディングに関するプロンプトと FlonCSS の全ドキュメントを提供
-    - `@floncss:refactor`: リファクタリングに関するプロンプトと FlonCSS の全ドキュメントを提供
-    - `@floncss:setting`: 設定に関するプロンプトと FlonCSS の設定ドキュメントを提供
+### 2. ツール機能
 
-- **プロンプト機能**: 事前定義されたプロンプトを管理・提供
-  - MCP プロトコルの prompts ケイパビリティをサポート
+チャットで以下のように指示することで、ツールを呼び出せます：
 
-## 例
+#### `handle_floncss_mention` ツール
 
-VS Code で次のように MCP コマンドを使用できます：
+FlonCSS のコーディングモードを起動するツールです。
+
+**使い方の例：**
+
+- 「`floncss:coding` モードで HTML を作成して」
+- 「`floncss:refactor` モードでこのコードを改善して」
+- 「`floncss:setting` モードで色の設定をして」
+
+**パラメータ：**
+
+- `text`: モード名（`floncss:coding`、`floncss:refactor`、`floncss:setting`）
+
+#### `get_floncss_docs` ツール
+
+FlonCSS のドキュメントを直接取得します。
+
+**使い方の例：**
+
+- 「FlonCSS の utilities ドキュメントを取得して」
+- 「FlonCSS の settings の colors ドキュメントを見せて」
+
+**パラメータ：**
+
+- `category`: ドキュメントのカテゴリ（"docs", "settings", "utilities"）
+- `path`: カテゴリ内の特定のパス（オプション）
+
+## 使用例
+
+### プロンプト機能を使う場合（推奨）
+
+VS Code Copilot チャットで：
 
 ```
-# FlonCSSのドキュメントを取得
-@floncss-mcp get_floncss_docs category=docs path=installation
+/floncss:coding
 
-# テキスト内のFlonCSSメンションを処理
-@floncss-mcp handle_floncss_mention text="FlonCSSを使って@floncss:codingしましょう"
+デザインに基づいてヒーローセクションを作成してください
+```
 
-# プロンプト機能を使用（VS CodeのMCPインターフェースによる）
+### ツール機能を使う場合
+
+VS Code Copilot チャットで：
+
+```
+floncss:coding モードでレスポンシブなナビゲーションを作成してください
+```
+
+または
+
+```
+FlonCSS の utilities ドキュメントを取得して、グリッドシステムの使い方を教えてください
 ```
 
 ## トラブルシューティング

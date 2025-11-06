@@ -31,13 +31,13 @@ export function createServer() {
             tools: [
                 {
                     name: "handle_floncss_mention",
-                    description: "Handle @floncss: mentions in text",
+                    description: "Activate FlonCSS coding modes with comprehensive documentation. Use 'floncss:coding' for general coding assistance, 'floncss:refactor' for code refactoring, or 'floncss:setting' for configuring CSS variables. This tool automatically loads relevant FlonCSS documentation and provides mode-specific guidance.",
                     inputSchema: {
                         type: "object",
                         properties: {
                             text: {
                                 type: "string",
-                                description: "Text containing @floncss: mentions",
+                                description: "The FlonCSS mode to activate. Use one of: 'floncss:coding' (for general FlonCSS coding assistance with full documentation), 'floncss:refactor' (for refactoring existing code to follow FlonCSS best practices), or 'floncss:setting' (for configuring FlonCSS settings and CSS variables based on design specifications).",
                             },
                         },
                         required: ["text"],
