@@ -6,14 +6,12 @@
 
 ### 前提条件
 
-- Node.js (v18 以上を推奨)
+- Node.js (v22 以上を推奨)
 - npm または yarn
 
 ### インストール
 
-#### 方法 1: npm パッケージから直接インストール（推奨）
-
-npm パッケージが公開されている場合は、以下のように設定できます：
+VS Code の MCP 設定に以下を追加します：
 
 ```json
 "mcp": {
@@ -25,38 +23,6 @@ npm パッケージが公開されている場合は、以下のように設定�
     }
   }
 }
-```
-
-#### 方法 2: ローカル開発用
-
-1. リポジトリをクローンする
-
-   ```bash
-   git clone https://github.com/dsflon/floncss-mcp
-   cd floncss-mcp
-   ```
-
-2. 依存関係をインストールする
-
-   ```bash
-   npm install
-   # または
-   yarn install
-   ```
-
-3. プロジェクトをビルドする
-   ```bash
-   npm run build
-   # または
-   yarn build
-   ```
-
-### 直接実行する（VS Code で MCP 設定する場合は不要）
-
-ビルド後、以下のコマンドで MCP サーバーを実行できます：
-
-```bash
-node build/index.js
 ```
 
 ## VS Code での MCP 設定方法
@@ -69,40 +35,7 @@ VS Code で MCP を使用するには、以下の手順で設定します。
 
 3. 「Model Context Protocol: Server Command Configuration」をクリックして、settings.json を編集
 
-4. settings.json に以下の設定を追加：
-
-**npm パッケージを使用する場合（推奨）：**
-
-```json
-"mcp": {
-  "servers": {
-    "floncss-mcp": {
-      "command": "npx",
-      "args": ["-y", "floncss-mcp"],
-      "type": "stdio"
-    }
-  }
-}
-```
-
-**ローカル開発版を使用する場合：**
-
-```json
-"mcp": {
-  "servers": {
-    "floncss-mcp": {
-      "command": "node",
-      "args": [
-        "<絶対パス>/floncss-mcp/build/index.js"
-      ],
-      "type": "stdio"
-    }
-  }
-}
-```
-
-注意: `<絶対パス>` の部分を実際のプロジェクトの絶対パスに置き換えてください。
-例えば: `/Users/username/MCP/floncss-mcp/build/index.js`
+4. 上記のインストールセクションの設定を追加
 
 5. VS Code を再起動して設定を反映
 
