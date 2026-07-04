@@ -34,15 +34,19 @@ export function getDocsByCategory(
 
 // FlonCSS ドキュメントツールの実装
 export function handleFlonCSSDocsRequest(
-  server: Server,
+  server: Server | undefined,
   category: string,
   path?: string
 ) {
-  // サーバーが接続されている状態でのみ使用可能
-  server.sendLoggingMessage({
-    level: "info",
-    data: `Fetching documentation for category: ${category}, path: ${path || 'all'}`,
-  });
+  // ロギングは接続済みサーバーがある場合のみ（未接続時の例外でリクエストを落とさない）
+  try {
+    server?.sendLoggingMessage({
+      level: "info",
+      data: `Fetching documentation for category: ${category}, path: ${path || 'all'}`,
+    });
+  } catch {
+    // ロギング失敗はドキュメント取得の結果に影響させない
+  }
 
   // カテゴリに基づいてドキュメントを取得
   const docs = getDocsByCategory(floncssDocs, category, path);

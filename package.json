@@ -7,7 +7,12 @@
     "floncss-mcp": "build/index.js"
   },
   "scripts": {
-    "build": "tsc && chmod 755 build/index.js"
+    "build": "tsc && chmod 755 build/index.js",
+    "test": "npm run build && node --test test/*.test.mjs",
+    "prepublishOnly": "npm run build"
+  },
+  "engines": {
+    "node": ">=18"
   },
   "files": [
     "build"
