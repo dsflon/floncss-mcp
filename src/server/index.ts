@@ -1,9 +1,12 @@
+import { createRequire } from "node:module";
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import {
   CallToolRequestSchema,
+  ErrorCode,
   GetPromptRequestSchema,
   ListPromptsRequestSchema,
   ListToolsRequestSchema,
+  McpError,
 } from "@modelcontextprotocol/sdk/types.js";
 import type { ServerConfig } from "../types/index.js";
 import { handleFlonCSSDocsRequest } from "./tools/floncss-docs.js";
@@ -13,10 +16,14 @@ import {
   handleListPromptsRequest
 } from "./tools/prompts.js";
 
+// package.json からバージョンを取得（ビルド後は build/server/ から見て2階層上）
+const require = createRequire(import.meta.url);
+const { version } = require("../../package.json") as { version: string };
+
 // サーバー設定
 const serverConfig: ServerConfig = {
   name: "floncss-docs",
-  version: "1.0.0",
+  version,
 };
 
 // サーバーインスタンスの初期化
@@ -26,20 +33,11 @@ export function createServer(): Server {
     {
       capabilities: {
         tools: {},
-        prompts: {}, // Promptsケイパビリティを追加
+        prompts: {},
         logging: {},
       },
     },
   );
-
-  try {
-    // データが正常にロードされたことを確認
-    // console.info("FlonCSS documentation loaded successfully");
-  } catch (error) {
-    // 接続前はconsole.errorを使用
-    console.error(`Failed to load FlonCSS documentation: ${error}`);
-    process.exit(1); // 読み込みに失敗した場合はプロセスを終了
-  }
 
   // 利用可能なToolの一覧を返すハンドラを設定
   server.setRequestHandler(ListToolsRequestSchema, async () => {
@@ -89,27 +87,30 @@ export function createServer(): Server {
 
   // 特定のプロンプトを返すハンドラー
   server.setRequestHandler(GetPromptRequestSchema, async (request) => {
-    return handleGetPromptRequest(request.params.id as string);
+    return handleGetPromptRequest(request.params.name, server);
   });
 
   // Toolの利用リクエストを処理するハンドラを設定
   server.setRequestHandler(CallToolRequestSchema, async (request) => {
-    if (request.params.name === "handle_floncss_mention") {
-      const { text } = request.params.arguments as {
-        text: string;
-      };
-      
-      return handleFloncssMentionRequest(text, server);
-    } else if (request.params.name === "get_floncss_docs") {
-      const { category, path } = request.params.arguments as {
-        category: string;
-        path?: string;
-      };
-      
-      return handleFlonCSSDocsRequest(server, category, path);
-    } 
+    const args = request.params.arguments ?? {};
 
-    throw new Error(`Unknown tool: ${request.params.name}`);
+    if (request.params.name === "handle_floncss_mention") {
+      const text = args.text;
+      if (typeof text !== "string") {
+        throw new McpError(ErrorCode.InvalidParams, "Missing required argument: text");
+      }
+      return handleFloncssMentionRequest(text, server);
+    }
+
+    if (request.params.name === "get_floncss_docs") {
+      const { category, path } = args as { category?: unknown; path?: unknown };
+      if (typeof category !== "string") {
+        throw new McpError(ErrorCode.InvalidParams, "Missing required argument: category");
+      }
+      return handleFlonCSSDocsRequest(server, category, typeof path === "string" ? path : undefined);
+    }
+
+    throw new McpError(ErrorCode.MethodNotFound, `Unknown tool: ${request.params.name}`);
   });
 
   return server;

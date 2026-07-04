@@ -115,7 +115,20 @@ floncss:coding モードでレスポンシブなナビゲーションを作成�
 FlonCSS の utilities ドキュメントを取得して、グリッドシステムの使い方を教えてください
 ```
 
+## 開発
+
+```bash
+# 依存関係のインストール
+npm install
+
+# ビルド（build/ ディレクトリに出力されます）
+npm run build
+
+# テストの実行（ビルドしてから node:test でスモークテストを実行）
+npm test
+```
+
 ## トラブルシューティング
 
-- **エラー「FlonCSS documentation loaded successfully」が表示されない場合**: ドキュメント JSON ファイルのパスが正しいか確認してください。
-- **VS Code で接続できない場合**: 設定の絶対パスが正しいか確認してください。
+- **プロンプトが一覧に表示されない場合**: MCP クライアントが Prompts 機能（`prompts/list`・`prompts/get`）に対応しているか確認してください。
+- **VS Code で接続できない場合**: MCP 設定の内容（コマンドやパス）が正しいか確認し、VS Code を再起動してください。

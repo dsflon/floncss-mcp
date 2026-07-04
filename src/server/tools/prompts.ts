@@ -1,6 +1,35 @@
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
-import { predefinedPrompts } from "../../data/prompts.js";
+import { ErrorCode, McpError } from "@modelcontextprotocol/sdk/types.js";
+import {
+  predefinedPrompts,
+  resolvePrompt,
+  type PromptType,
+} from "../../data/prompts.js";
 import { handleFlonCSSDocsRequest } from "./floncss-docs.js";
+
+/**
+ * モードに応じてプロンプト本文とFlonCSSドキュメントを結合したテキストを生成します
+ * - coding / refactor: docs, utilities, settings の全ドキュメントを同梱
+ * - setting: settings カテゴリのドキュメントのみを同梱
+ *
+ * @param promptType モード（coding, refactor, setting）
+ * @param server MCPサーバーインスタンス（ドキュメント取得時のロギング用）
+ */
+export function buildModeText(promptType: PromptType, server?: Server): string {
+  const prompt = predefinedPrompts[promptType];
+
+  if (promptType === "setting") {
+    const settingsAll = handleFlonCSSDocsRequest(server, "settings");
+    return `Activating FlonCSS ${promptType} mode with settings documentation.\n\n${prompt.content}\n\n## FlonCSS Settings Documentation\n\n${settingsAll.content[0].text}`;
+  }
+
+  // coding / refactor は全カテゴリのドキュメントを同梱
+  const allDocs = ["docs", "utilities", "settings"]
+    .map(category => handleFlonCSSDocsRequest(server, category).content[0].text)
+    .join("\n\n");
+
+  return `Activating FlonCSS ${promptType} mode with complete reference documentation.\n\n${prompt.content}\n\n## FlonCSS Complete Reference Documentation\n\n${allDocs}`;
+}
 
 /**
  * プロンプト一覧取得リクエストのハンドラー
@@ -8,49 +37,50 @@ import { handleFlonCSSDocsRequest } from "./floncss-docs.js";
  */
 export function handleListPromptsRequest() {
   const prompts = Object.values(predefinedPrompts).map(prompt => ({
-    id: prompt.id,
     name: prompt.name,
+    title: prompt.title,
     description: prompt.description,
   }));
-  
+
   return { prompts };
 }
 
 /**
  * 特定のプロンプト取得リクエストのハンドラー
- * 指定されたIDのプロンプトの詳細情報を返します
- * 
- * @param promptId リクエストされたプロンプトID
+ * 指定された名前のプロンプトを、関連ドキュメントを同梱して返します
+ *
+ * @param promptName リクエストされたプロンプト名（例: "floncss-coding"）
+ * @param server MCPサーバーインスタンス（ドキュメント取得時のロギング用）
  */
-export function handleGetPromptRequest(promptId: string) {
-  const prompt = Object.values(predefinedPrompts).find(p => p.id === promptId);
-  
-  if (!prompt) {
-    return {
-      content: [
-        {
-          type: "text",
-          text: `Prompt not found: ${promptId}`,
-        },
-      ],
-    };
+export function handleGetPromptRequest(promptName: string, server?: Server) {
+  const resolved = resolvePrompt(promptName);
+
+  if (!resolved) {
+    throw new McpError(
+      ErrorCode.InvalidParams,
+      `Prompt not found: ${promptName}. Available prompts: ${Object.values(predefinedPrompts).map(p => p.name).join(", ")}`
+    );
   }
-  
+
   return {
-    content: [
+    description: resolved.prompt.description,
+    messages: [
       {
-        type: "text",
-        text: prompt.content,
+        role: "user" as const,
+        content: {
+          type: "text" as const,
+          text: buildModeText(resolved.type, server),
+        },
       },
     ],
   };
 }
 
 /**
- * @floncsメンション処理ハンドラー
+ * floncssメンション処理ハンドラー
  * テキスト内のfloncss:タイプ形式のメンションを検出して対応するプロンプトを返します
  * @記号の有無に関わらず floncss:coding, floncss:refactor, floncss:setting を検出します
- * 
+ *
  * @param text 処理対象のテキスト
  * @param server MCPサーバーインスタンス（ドキュメントツール呼び出し用）
  */
@@ -58,82 +88,26 @@ export function handleFloncssMentionRequest(text: string, server?: Server) {
   // floncss:タイプ形式のメンションを検出（@記号の有無に関わらず）
   const mentionRegex = /@?floncss:(coding|refactor|setting)/i;
   const match = text.match(mentionRegex);
-  
+
   if (!match) {
     return {
       content: [
         {
-          type: "text",
+          type: "text" as const,
           text: "No FlonCSS mode found. Available modes: 'floncss:coding', 'floncss:refactor', 'floncss:setting'",
         },
       ],
-    };
-  }
-  
-  // マッチしたモードタイプを取得（小文字に変換）
-  const promptType = match[1].toLowerCase(); // coding, refactor, setting のいずれか
-  const prompt = predefinedPrompts[promptType as keyof typeof predefinedPrompts];
-  
-  if (!prompt) {
-    return {
-      content: [
-        {
-          type: "text",
-          text: `Unknown mode: ${promptType}. Available modes: ${Object.keys(predefinedPrompts).join(', ')}`,
-        },
-      ],
+      isError: true,
     };
   }
 
-  // coding または refactor プロンプトの場合、自動的にFlonCSSドキュメントを取得
-  if ((promptType === 'coding' || promptType === 'refactor') && server) {
-    let allDocs = '';
-    
-    // docs カテゴリの全ドキュメント
-    const docseAll = handleFlonCSSDocsRequest(server, 'docs');
-    allDocs += `${docseAll.content[0].text}\n\n`;
-    
-    // utilities カテゴリの全ドキュメント
-    const utilitiesAll = handleFlonCSSDocsRequest(server, 'utilities');
-    allDocs += `${utilitiesAll.content[0].text}\n\n`;
-    
-    // settings カテゴリの全ドキュメント
-    const settingsAll = handleFlonCSSDocsRequest(server, 'settings');
-    allDocs += `${settingsAll.content[0].text}\n\n`;
-    
-    // ドキュメント情報とプロンプトを組み合わせる
-    return {
-      content: [
-        {
-          type: "text",
-          text: `Activating FlonCSS ${promptType} mode with complete reference documentation.\n\n${prompt.content}\n\n## FlonCSS Complete Reference Documentation\n\n${allDocs}`
-        },
-      ],
-    };
-  }
-  
-  // setting プロンプトの場合、settings カテゴリのドキュメントのみを取得
-  if (promptType === 'setting' && server) {
-    // settings カテゴリのドキュメントのみ
-    const settingsAll = handleFlonCSSDocsRequest(server, 'settings');
-    
-    // ドキュメント情報とプロンプトを組み合わせる
-    return {
-      content: [
-        {
-          type: "text",
-          text: `Activating FlonCSS ${promptType} mode with settings documentation.\n\n${prompt.content}\n\n## FlonCSS Settings Documentation\n\n${settingsAll.content[0].text}`
-        },
-      ],
-    };
-  }
-  
-  // 他のプロンプトタイプの場合は通常どおり処理
+  const promptType = match[1].toLowerCase() as PromptType;
+
   return {
     content: [
       {
-        type: "text",
-        text: `Activating FlonCSS ${promptType} mode.\n\n${prompt.content}`,
+        type: "text" as const,
+        text: buildModeText(promptType, server),
       },
     ],
   };

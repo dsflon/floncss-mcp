@@ -3,22 +3,24 @@
  * プロンプトはLLMの動作を調整するための指示セットです
  */
 
+export type PromptType = "coding" | "refactor" | "setting";
+
 export type Prompt = {
-  id: string;
+  /** MCPのprompts/list・prompts/getで使用する識別子（スラッシュコマンド名になる） */
   name: string;
+  /** 表示用タイトル */
+  title: string;
   description: string;
   content: string;
 };
 
-export type PromptCollection = {
-  [key: string]: Prompt;
-};
+export type PromptCollection = Record<PromptType, Prompt>;
 
 // FlonCSS用の事前定義されたプロンプト
 export const predefinedPrompts: PromptCollection = {
   "coding": {
-    id: "floncss-coding",
-    name: "FlonCSS Coding Mode",
+    name: "floncss-coding",
+    title: "FlonCSS Coding Mode",
     description: "Activate FlonCSS coding assistant mode with complete documentation for building HTML/CSS following FlonCSS framework best practices and ITCSS principles",
     content: `
 あなたはFlonCSSのエキスパートです。
@@ -45,8 +47,8 @@ export const predefinedPrompts: PromptCollection = {
 `
   },
   "refactor": {
-    id: "floncss-refactor",
-    name: "FlonCSS Refactoring Mode",
+    name: "floncss-refactor",
+    title: "FlonCSS Refactoring Mode",
     description: "Activate FlonCSS refactoring mode with complete documentation for refactoring existing HTML/CSS to follow FlonCSS best practices and ITCSS architecture",
     content: `
 あなたはFlonCSSを使ったコードのリファクタリングエキスパートです。
@@ -75,8 +77,8 @@ export const predefinedPrompts: PromptCollection = {
 `
   },
   "setting": {
-    id: "floncss-setting",
-    name: "FlonCSS Settings Configuration Mode",
+    name: "floncss-setting",
+    title: "FlonCSS Settings Configuration Mode",
     description: "Activate FlonCSS settings configuration mode with settings documentation for configuring CSS variables (colors, fonts, gutters, gaps, breakpoints) based on design specifications",
     content: `
 あなたはFlonCSSのsettings設定のエキスパートです。
@@ -111,3 +113,16 @@ export const predefinedPrompts: PromptCollection = {
 `
   }
 };
+
+/**
+ * プロンプト名（"floncss-coding"）またはモードキー（"coding"）からプロンプトを解決します
+ */
+export function resolvePrompt(nameOrType: string): { type: PromptType; prompt: Prompt } | undefined {
+  const normalized = nameOrType.toLowerCase();
+  for (const [type, prompt] of Object.entries(predefinedPrompts) as [PromptType, Prompt][]) {
+    if (prompt.name === normalized || type === normalized) {
+      return { type, prompt };
+    }
+  }
+  return undefined;
+}
