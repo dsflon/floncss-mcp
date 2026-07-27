@@ -88,13 +88,45 @@ test("get_floncss_docs returns docs for a category and path", async () => {
   assert.match(single.content[0].text, /settings\/colors/);
 });
 
-test("get_floncss_docs reports missing documentation", async () => {
+test("get_floncss_docs reports missing documentation with available paths", async () => {
   const client = await connectClient();
   const result = await client.callTool({
     name: "get_floncss_docs",
     arguments: { category: "docs", path: "does-not-exist" },
   });
+  assert.equal(result.isError, true);
   assert.match(result.content[0].text, /No documentation found/);
+  // 再試行できるよう有効なパス一覧が含まれる
+  assert.match(result.content[0].text, /Available paths in 'docs': .*installation/);
+});
+
+test("get_floncss_docs reports unknown category with available categories", async () => {
+  const client = await connectClient();
+  const result = await client.callTool({
+    name: "get_floncss_docs",
+    arguments: { category: "bogus" },
+  });
+  assert.equal(result.isError, true);
+  assert.match(result.content[0].text, /Available categories: docs, settings, utilities/);
+});
+
+test("tools/list exposes path hints and read-only annotations", async () => {
+  const client = await connectClient();
+  const { tools } = await client.listTools();
+  const docsTool = tools.find(t => t.name === "get_floncss_docs");
+  assert.match(docsTool.inputSchema.properties.path.description, /installation/);
+  assert.match(docsTool.inputSchema.properties.path.description, /colors/);
+  assert.equal(docsTool.annotations?.readOnlyHint, true);
+});
+
+test("logging/setLevel is accepted", async () => {
+  const client = await connectClient();
+  await client.setLoggingLevel("warning");
+});
+
+test("initialize exposes server instructions", async () => {
+  const client = await connectClient();
+  assert.match(client.getInstructions(), /FlonCSS/);
 });
 
 test("calling an unknown tool returns an error", async () => {

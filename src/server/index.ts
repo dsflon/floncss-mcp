@@ -7,9 +7,15 @@ import {
   ListPromptsRequestSchema,
   ListToolsRequestSchema,
   McpError,
+  SetLevelRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
 import type { ServerConfig } from "../types/index.js";
-import { handleFlonCSSDocsRequest } from "./tools/floncss-docs.js";
+import { setLogLevel } from "./logging.js";
+import {
+  DOC_CATEGORIES,
+  handleFlonCSSDocsRequest,
+  listAvailablePaths,
+} from "./tools/floncss-docs.js";
 import {
   handleFloncssMentionRequest,
   handleGetPromptRequest,
@@ -26,6 +32,14 @@ const serverConfig: ServerConfig = {
   version,
 };
 
+// クライアント（LLM）向けのサーバー利用ガイド。initialize 応答で通知される
+const SERVER_INSTRUCTIONS = [
+  "This server provides documentation and coding modes for FlonCSS, a hybrid CSS framework that combines minimal utility-first CSS with ITCSS-based architecture (https://floncss.dsflon.net/).",
+  "- Use the `get_floncss_docs` tool to fetch reference documentation by category ('docs' | 'settings' | 'utilities') and an optional page path.",
+  "- Use the `handle_floncss_mention` tool with 'floncss:coding', 'floncss:refactor', or 'floncss:setting' (or the floncss-coding / floncss-refactor / floncss-setting prompts) to activate a mode whose response embeds the relevant documentation.",
+  "The bundled documentation reflects FlonCSS v3.",
+].join("\n");
+
 // サーバーインスタンスの初期化
 export function createServer(): Server {
   const server = new Server(
@@ -36,11 +50,23 @@ export function createServer(): Server {
         prompts: {},
         logging: {},
       },
+      instructions: SERVER_INSTRUCTIONS,
     },
   );
 
+  // logging capability を宣言している以上、logging/setLevel に応答する必要がある
+  server.setRequestHandler(SetLevelRequestSchema, async (request) => {
+    setLogLevel(server, request.params.level);
+    return {};
+  });
+
   // 利用可能なToolの一覧を返すハンドラを設定
   server.setRequestHandler(ListToolsRequestSchema, async () => {
+    // 利用可能なパス一覧をデータから動的に生成（ドキュメント追加時に自動追従）
+    const pathHints = DOC_CATEGORIES
+      .map((category) => `${category}: ${listAvailablePaths(category).join(", ")}`)
+      .join(" / ");
+
     return {
       tools: [
         {
@@ -56,24 +82,38 @@ export function createServer(): Server {
             },
             required: ["text"],
           },
+          annotations: {
+            title: "Activate FlonCSS Mode",
+            readOnlyHint: true,
+            destructiveHint: false,
+            idempotentHint: true,
+            openWorldHint: false,
+          },
         },
         {
           name: "get_floncss_docs",
-          description: "Get FlonCSS documentation content",
+          description: "Get FlonCSS documentation content by category, optionally narrowed to a specific page.",
           inputSchema: {
             type: "object",
             properties: {
               category: {
                 type: "string",
                 description: "Documentation category (docs, settings, utilities)",
-                enum: ["docs", "settings", "utilities"]
+                enum: [...DOC_CATEGORIES],
               },
               path: {
                 type: "string",
-                description: "Optional specific path within the category (e.g. 'colors', 'installation')",
+                description: `Optional page path within the category. Available pages — ${pathHints}`,
               },
             },
             required: ["category"],
+          },
+          annotations: {
+            title: "Get FlonCSS Documentation",
+            readOnlyHint: true,
+            destructiveHint: false,
+            idempotentHint: true,
+            openWorldHint: false,
           },
         },
       ],

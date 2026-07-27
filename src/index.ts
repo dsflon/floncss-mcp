@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { createServer } from "./server/index.js";
+import { sendLog } from "./server/logging.js";
 
 /**
  * FlonCSS MCPサーバーのメインエントリーポイント
@@ -17,8 +18,5 @@ const server = createServer();
 const transport = new StdioServerTransport();
 await server.connect(transport);
 
-// 接続後のみsendLoggingMessageを使用
-server.sendLoggingMessage({
-  level: "info",
-  data: "FlonCSS documentation server with prompts started successfully",
-});
+// 接続後のみロギング通知を送信（sendLog は送信失敗を握りつぶす）
+sendLog(server, "info", "FlonCSS documentation server with prompts started successfully");
