@@ -28,11 +28,12 @@ export const predefinedPrompts: PromptCollection = {
 まず、以下のFlonCSSドキュメントを参照し、フレームワークの特徴と使用方法を十分に理解してください:
 
 1. FlonCSSはユーティリティーファーストのCSSフレームワークであり、ITCSSベースの設計を合わせたハイブリッドなアプローチです
-2. Settings（設定）、Tools（ツール）、Generic（一般）、Base（基本）、Objects（オブジェクト）、Components（コンポーネント）、Trumps（切り札）の7つのレイヤーで構成されています
+2. Settings（設定）、Tools（ツール）、Generic（一般）、Base（基本）、Objects（オブジェクト）、Components（コンポーネント）、Trumps（切り札）のレイヤーで構成され、レイヤー順序はCSSカスケードレイヤー（@layer）で担保されるため、@importの記述順に関係なくutility class（trumps）が常に最優先されます
 3. カラー設定やフォントサイズなどの基本設定はCSS変数として定義され、utility classと連携しています
 4. レスポンシブ対応のため4つのブレイクポイント(@sm、@md、@lg、@xl)が用意されています
-5. 12カラムグリッドシステムで柔軟なレイアウトを構築できます
-6. CSS Architecture Based on ITCSS（ITCSSに基づくCSS設計）の原則に従っています
+5. レイアウトはCSS Gridベースの grid / grid-cols:N / col-span:N / row-span:N を優先して使用してください。Flexベースの12カラムシステム（.cols / cols:N）は非推奨（deprecated）のため、新規実装では使用しないでください
+6. gap / row-gap は明示的に指定しない限り 0（オプトイン）です。コンテナ間隔が必要な場合は gap:* クラスを付与してください
+7. CSS Architecture Based on ITCSS（ITCSSに基づくCSS設計）の原則に従っています
 
 これらの知識をもとに、以下の指針に従いコーディングしてください：
 
@@ -56,10 +57,11 @@ export const predefinedPrompts: PromptCollection = {
 まず、以下のFlonCSSドキュメントを参照し、フレームワークの特徴と使用方法を十分に理解してください:
 
 1. FlonCSSはユーティリティーファーストのCSSフレームワークであり、ITCSSベースの設計を合わせたハイブリッドなアプローチです
-2. Settings（設定）、Tools（ツール）、Generic（一般）、Base（基本）、Objects（オブジェクト）、Components（コンポーネント）、Trumps（切り札）の7つのレイヤーで構成されています
+2. Settings（設定）、Tools（ツール）、Generic（一般）、Base（基本）、Objects（オブジェクト）、Components（コンポーネント）、Trumps（切り札）のレイヤーで構成され、レイヤー順序はCSSカスケードレイヤー（@layer）で担保されるため、@importの記述順に関係なくutility class（trumps）が常に最優先されます
 3. カラー設定やフォントサイズなどの基本設定はCSS変数として定義され、utility classと連携しています
 4. レスポンシブ対応のため4つのブレイクポイント(@sm、@md、@lg、@xl)が用意されています
-5. 12カラムグリッドシステムで柔軟なレイアウトを構築できます
+5. レイアウトはCSS Gridベースの grid / grid-cols:N / col-span:N / row-span:N を優先して使用してください。Flexベースの12カラムシステム（.cols / cols:N）は非推奨（deprecated）のため、既存コードで見つけた場合はGridベースへの置き換えを検討してください
+6. gap / row-gap は明示的に指定しない限り 0（オプトイン）です
 
 これらの知識をもとに、以下のリファクタリング原則に従ってください：
 

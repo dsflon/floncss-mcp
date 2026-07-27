@@ -2,6 +2,8 @@
 
 このリポジトリは、FlonCSS のドキュメントを提供する Model Context Protocol（MCP）サーバーを実装しています。VS Code 内で FlonCSS のドキュメントを簡単に参照できるようになります。
 
+同梱しているドキュメント・プロンプトは [FlonCSS v3.1.0](https://github.com/dsflon/FlonCSS-core/releases) 時点の内容に対応しています（本体サイト: https://floncss.dsflon.net/ ）。FlonCSS 本体がアップデートされた場合は `src/data/floncss-docs.ts` / `src/data/prompts.ts` の内容もあわせて見直してください。
+
 ## セットアップと実行方法
 
 ### 前提条件
